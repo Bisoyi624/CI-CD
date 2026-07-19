@@ -1,0 +1,90 @@
+pipeline {
+    agent {
+        label 'microservice'
+    }
+    stages {
+        stage('git-clone') {
+            steps {
+				dir('git-repo') {
+					git branch: 'main', url: 'https://github.com/devsecopstrainer/student-service.git'
+				}
+			}
+        }
+        stage('mvn-build') {
+            steps {
+				dir('git-repo') {
+					sh 'mvn clean package'
+				}
+            }
+        }
+		stage('SonarQube Analysis') {
+			steps {
+				dir('git-repo') {
+					withSonarQubeEnv('SonarServer') {
+						sh 'echo "success"'
+						// sh 'mvn sonar:sonar -Dsonar.projectKey=student-service'
+					}
+				}
+			}
+		}
+        stage('Quality Gate') {
+            steps {
+                timeout(time: 3, unit: 'MINUTES') {
+					sh 'echo "success"'
+                	// waitForQualityGate abortPipeline: true
+                }
+            }
+        }
+        stage('upload-to-nexus') {
+			steps {
+				dir('git-repo') {
+					sh 'echo "success"'
+                	// sh 'mvn deploy'
+            	}
+			}
+        }
+        stage('Checkout Dockerfile') {
+            steps {
+                dir('docker-repo') {
+                    git branch: 'main', url: 'https://github.com/devsecopstrainer/cicd.git'
+                }
+            }
+        }
+        stage('Docker build') {
+            steps {
+				sh 'echo "success"'
+               sh 'docker build -f docker-repo/student-service-Dockerfile -t student-service:${BUILD_NUMBER} .'
+            }
+        }
+        stage('Trivy Scan') {
+            steps {
+				sh '''
+					export TMPDIR=/data/trivy-tmp
+					sudo mkdir -p $TMPDIR
+					sudo mkdir -p /data/trivy-cache
+					sudo chown -R $(whoami):$(whoami) /data/trivy-cache /data/trivy-tmp
+					#trivy image --scanners vuln --severity HIGH,CRITICAL --exit-code 1 --cache-dir /data/trivy-cache student-service:${BUILD_NUMBER}
+					trivy image --scanners vuln --severity HIGH,CRITICAL --cache-dir /data/trivy-cache student-service:${BUILD_NUMBER}
+				''' 
+			   }
+        }		
+        stage('ECR Login') {
+            steps {
+				sh 'echo "success"'
+               sh 'aws ecr get-login-password --region ap-south-1 | docker login --username AWS --password-stdin 834362069350.dkr.ecr.ap-south-1.amazonaws.com'
+            }
+        }
+        stage('Tag Image') {
+            steps {
+			sh 'echo "success"'
+              sh 'docker tag student-service:${BUILD_NUMBER} 834362069350.dkr.ecr.ap-south-1.amazonaws.com/student-service:${BUILD_NUMBER}'
+            }
+        }
+        stage('Push Image To ECR') {
+            steps {
+			sh 'echo "success"'
+              sh 'docker push 834362069350.dkr.ecr.ap-south-1.amazonaws.com/student-service:${BUILD_NUMBER}'
+            }
+        }
+    }
+}
