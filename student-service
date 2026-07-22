@@ -45,7 +45,7 @@ pipeline {
         stage('Checkout Dockerfile') {
             steps {
                 dir('docker-repo') {
-                    git branch: 'main', url: 'https://github.com/Bisoyi624/CI-CD.git'
+                    git branch: 'master', url: 'https://github.com/Bisoyi624/CI-CD.git'
                 }
             }
         }
