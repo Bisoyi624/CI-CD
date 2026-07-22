@@ -6,7 +6,7 @@ pipeline {
         stage('git-clone') {
             steps {
 				dir('git-repo') {
-					git branch: 'main', url: 'https://github.com/devsecopstrainer/student-service.git'
+					git branch: 'main', url: 'https://github.com/Bisoyi624/student-service.git'
 				}
 			}
         }
