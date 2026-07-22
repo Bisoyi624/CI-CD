@@ -30,7 +30,7 @@ pipeline {
             steps {
                 timeout(time: 1, unit: 'MINUTES') {
 					sh 'echo "success"'
-                	// waitForQualityGate abortPipeline: true
+                	  waitForQualityGate abortPipeline: true
                 }
             }
         }
