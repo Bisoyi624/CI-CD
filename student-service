@@ -21,12 +21,12 @@ pipeline {
 			steps {
 				dir('git-repo') {
 					withSonarQubeEnv('SonarServer') {
-					   sh 'echo "success"'
+					  // sh 'echo "success"'
 						 sh "mvn clean verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar \
-  -Dsonar.projectKey=student-service \
-  -Dsonar.projectName='student-service' \
-  -Dsonar.host.url=http://3.109.62.15:9000 \
-  -Dsonar.token=sqp_1073693296ef348448c38860af8bd867b574e4b4"
+                            -Dsonar.projectKey=student-service \
+                            -Dsonar.projectName='student-service' \
+                            -Dsonar.host.url=http://3.109.62.15:9000 \
+                            -Dsonar.token=sqp_1073693296ef348448c38860af8bd867b574e4b4"
 					}
 				}
 			}
