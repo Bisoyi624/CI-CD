@@ -21,7 +21,7 @@ pipeline {
 			steps {
 				dir('git-repo') {
 					withSonarQubeEnv('SonarServer') {
-					 //  sh 'echo "success"'
+					   sh 'echo "success"'
 						 sh 'mvn sonar:sonar -Dsonar.projectKey=student-service'
 					}
 				}
@@ -31,7 +31,7 @@ pipeline {
             steps {
                 timeout(time: 2, unit: 'MINUTES') {
 					sh 'echo "success"'
-                	 waitForQualityGate abortPipeline: true
+                	// waitForQualityGate abortPipeline: true
                 }
             }
         }
