@@ -20,10 +20,18 @@ pipeline {
 		stage('SonarQube Analysis') {
 			steps {
 				dir('git-repo') {
-					withSonarQubeEnv('SonarServer') {
-                        sh 'echo "success"'
-                          sh 'mvn sonar:sonar -Dsonar.projectKey=student-service'
-					}
+                     withSonarQubeEnv('SonarQube') {
+                         withCredentials([string(credentialsId: 'sonarqube-token', variable: 'SONAR_TOKEN')]) {
+                          sh '''
+                             mvn clean verify \
+                             org.sonarsource.scanner.maven:sonar-maven-plugin:5.2.0.4988:sonar \
+                            -Dsonar.projectKey=student-service \
+                            -Dsonar.projectName=student-service \
+                            -Dsonar.host.url=http://13.201.23.71:9000 \
+                            -Dsonar.token=sqp_0d021152a00ef7c8798334801a03cf093dd669ab
+                         '''
+                        }
+                    }
 				}
 			}
 		}
