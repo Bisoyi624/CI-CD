@@ -36,7 +36,7 @@ pipeline {
             steps {
                 timeout(time: 2, unit: 'MINUTES') {
 					sh 'echo "success"'
-                	// waitForQualityGate abortPipeline: true
+                	 waitForQualityGate abortPipeline: true
                 }
             }
         }
@@ -44,7 +44,7 @@ pipeline {
 			steps {
 				dir('git-repo') {
 				   sh 'echo "success"'
-                	  sh 'mvn deploy'
+                	//  sh 'mvn deploy'
             	}
 			}
         }
